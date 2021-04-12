@@ -32,16 +32,17 @@ El controlador se encarga de mediar entre la vista y el modelo.
 
 # Inicialización del Catálogo de libros
     #Inicia el catálogo de videos en Array
-def initCatalog(typemap, chargeFactor):
-    catalog = model.newCatalog(typemap, chargeFactor)
-    print(typemap, "En el controller")
-    print(chargeFactor, "En el controller")
+
+def initCatalog():
+    catalog = model.newCatalog()
     return catalog
+
     #Inicia el catálogod de videos en Linked list
 # def initCatalogLinked():
 #     catalog = model.newCatalog_Linked()
 #     return catalog
 # # Funciones para la carga de datos
+
 def Load_Data(catalog):
     """
     Carga los datos de los archivos y cargar los datos en la
@@ -71,14 +72,14 @@ def LoadVideos(catalog):
     cada uno de ellos, se crea en la lista de autores, a dicho autor y una
     referencia al libro que se esta procesando.
     """
-    videosfile = cf.data_dir + 'videos-small.csv'
+    videosfile = cf.data_dir + 'videos-supersmall.csv'
     input_file = csv.DictReader(open(videosfile, encoding='utf-8'))
     for videos in input_file:
         model.addVideo(catalog,videos)
 
 def LoadCategory(catalog):
     categoryfile = cf.data_dir + 'category-id.csv'
-    input_file = csv.DictReader(open(categoryfile, encoding='utf-8'))
+    input_file = csv.DictReader(open(categoryfile, encoding='utf-8'),  delimiter='\t')
     for category in input_file:
         model.addCategories(catalog,category)
 # Funciones de ordenamiento
@@ -139,3 +140,6 @@ def deltaMemory(start_memory, stop_memory):
     # de Byte -> kByte
     delta_memory = delta_memory/1024.0
     return delta_memory
+
+def tendencyByCategory(catalog, ca_name):
+    return model.tendencyByCategory(catalog, ca_name)

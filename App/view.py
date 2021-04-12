@@ -40,15 +40,16 @@ def printMenu():
     print("Bienvenido")
     print("1- Inicializar cátalogo")
     print('2- Cargar cátalogo')
+    print('3- Buscar mayor tendencia por categoría')
     # print("4- Cargar el video con mayor cantidad de días en tendencia, según categoría")
     # print("6- Crear lista de los vídeos más vistos en un país y con categoría específica")
 
 
-def initCatalog(typemap, chargeFactor):
+def initCatalog():
     """
     Inicializa el catalogo de libros
     """
-    return controller.initCatalog(typemap, chargeFactor)
+    return controller.initCatalog()
 
 def printResults(videos, sample=3):
     size = lt.size(videos)
@@ -71,33 +72,29 @@ while True:
 
     if int(inputs[0]) == 1:
         print("Iniciando cátalogo...")
-        Prob_or_Chain = int(input("Introduzca 1 para Probing o 2 para Chaining:\n"))
-        if Prob_or_Chain == 1:
-            Prob_or_Chain = "PROBING"
-        else:
-            Prob_or_Chain = "CHAINING"
-        chargeFactor = float(input("Introduzca el factor de carga deseado:\n"))
-        cont = initCatalog(Prob_or_Chain, chargeFactor)
+        cont = initCatalog()
+        
     elif int(inputs[0]) == 2:
         print("Cargando información...")
         answer = controller.Load_Data(cont)
         print("Cargando información de los archivos ....")
         print('Videos cargados: ' + str(controller.VideoSize(cont)))
-        print('Países cargados: ' + str(controller.CountrySize(cont)))
-        print('Etiquetas cargadas: ' + str(controller.TagSize(cont)))
         print('Categorías cargadas: ' + str(controller.CategoriesSize(cont)))
         print("Tiempo [ms]: ", f"{answer[0]:.3f}", "  ||  ",
               "Memoria [kB]: ", f"{answer[1]:.3f}")
-
         
+    elif int(inputs[0]) == 3:
+        ca_name = input("¿Qué categoría desea consultar? ")
+        controller.tendencyByCategory(cont, ca_name)
 
-    elif int(inputs[0]) == 2:
-        catalog = initCatalog()
-        Load_Data(catalog)
-        howMuch = int(input('Ingrese la cantidad de videos que desea archivar: '))
-        whatCategory = str(input('Ingrese el nombre de la categoría que desea buscar: '))
-        result = controller.LikesbyCategory(catalog, howMuch, whatCategory)
-        print(result)
+    # elif int(inputs[0]) == 2:
+    #     catalog = initCatalog()
+    #     Load_Data(catalog)
+    #     howMuch = int(input('Ingrese la cantidad de videos que desea archivar: '))
+    #     whatCategory = str(input('Ingrese el nombre de la categoría que desea buscar: '))
+    #     result = controller.LikesbyCategory(catalog, howMuch, whatCategory)
+    #     print(result)
+        
     # elif int(inputs[0]) == 4:
     #     n_category = input("¿A cuál categoría (según ID) desea consultar?")
     #     result = controller.getGreatestTendency(catalog, n_category)

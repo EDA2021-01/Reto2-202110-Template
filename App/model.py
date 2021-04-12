@@ -44,23 +44,21 @@ los mismos.
 """
 
 # Construccion de modelos Array
-def newCatalog(typemap, chargeFactor):
+def newCatalog():
     catalog = {'videos': None,
                'country': None,
                'tagvideos': None,
                'categories': None}
     catalog['videos'] = lt.newList('SINGLE_LINKED')
     catalog['country'] = mp.newMap(150,
-                                    maptype=typemap,
-                                    loadfactor=chargeFactor)
+                                    maptype="CHAINING",
+                                    loadfactor=2.0)
     catalog['tagvideos'] = mp.newMap(50000,
-                                     maptype=typemap,
-                                    loadfactor=chargeFactor)
+                                     maptype="CHAINING",
+                                    loadfactor=2.0)
     catalog['categories'] = mp.newMap(32,
-                                     maptype=typemap,
-                                    loadfactor=chargeFactor)
-    print(typemap, "En el model")
-    print(chargeFactor, "En el model")
+                                     maptype="CHAINING",
+                                    loadfactor=2.0)
     return catalog
 
 # Funciones para agregar informacion al catalogo
@@ -75,7 +73,6 @@ def addVideo(catalog, video):
     #Adiciona los países en su respectiva llave
     addCountry(catalog, video)
     
-
 def addCountry(catalog, video):
     countries = catalog['country']
     act_country = video['country']
@@ -94,7 +91,7 @@ def addCountry(catalog, video):
     else: 
         country = newCountry(act_country)
         mp.put(countries, act_country, country)
-        lt.addLast(country['videos'], video)
+    lt.addLast(country['videos'], video)
 
 def addTagsVideo(catalog, n_tag, video):
     tagvideos = catalog['tagvideos']
@@ -115,18 +112,19 @@ def addTagsVideo(catalog, n_tag, video):
      # lt.addLast(videotag['videos'], video)
 
 
-def addCategories(catalog, categories_videos):
+def addCategories(catalog, category):
     #     category = NewCategories(categories_videos['name'], categories_videos['id'])
     #     lt.addLast(catalog['categories'], category)
-    lista = categories_videos["id\tname"].split("\t ")
-    categories_videos["id"] = lista[0]
-    categories_videos["name"] = lista[1].strip()
-    t = NewCategories(categories_videos["id"], categories_videos['name'])
-    lt.addLast(catalog['categories'], t)
+    # lista = categories_videos["id\tname"].split("\t ")
+    # categories_videos["id"] = lista[1].strip()
+    # categories_videos["name"] = lista[0]
+    t = newCategories(category['name'], category["id"])
+    mp.put(catalog['categories'], t['name'], t['id'])
     # Funciones para creacion de datos
     # Estas funciones son precisamente para hacer la creación 
     # De las llaves y sus respectivos valores (llaves vacías, la idea es crear la llave y en las funciones
     # de agregar información al catálogo se completan)
+
 def newCountry(n_country):
     country = {'name': "", 'videos': None}
     country['name'] = n_country
@@ -139,10 +137,10 @@ def newVideoTag(tag_name):
     video_tag['videos'] = lt.newList('ARRAY_LIST')
     return video_tag
 
-def NewCategories(name, id):
+def newCategories(name, ca_id):
     categories_videos = {'name': "", 'id': ""}
     categories_videos['name'] = name
-    categories_videos['id'] = id
+    categories_videos['id'] = ca_id
     return categories_videos
 
 # Funciones utilizadas para comparar elementos dentro de una lista
@@ -240,3 +238,22 @@ def LikesbyCategory(catalog, number, category):
 #             days = video['ammount_of_days']
 #             best = video
 #     return best
+
+# def compareCategories(videos, ca_id):
+#     if videos['info']['category_id'] == ca_id:
+    
+def findIDwithName(catalog, ca_name):
+    if mp.contains(catalog['categories'], ca_name):
+        ca_id = mp.get(catalog['categories'], ca_name)
+        ca_id = me.getValue(ca_id)
+        return ca_id
+
+def tendencyByCategory(catalog, ca_name):
+    video_template = {'title': "", 
+                      'channel_title': "", 
+                      'category_id': "", 
+                      'days_trending': [],
+                      'ammount_of_days': 0}
+    videos = catalog['videos']['first']
+    ca_id = findIDwithName(catalog, ca_name)
+    print(mp.keySet(catalog['categories']))
